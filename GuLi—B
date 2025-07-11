@@ -1,1 +1,652 @@
-nil
+-- Matrix GUI Library for Roblox (Mobile & Exploit Compatible)
+local MatrixGUI = {}
+MatrixGUI.__index = MatrixGUI
+
+-- Сервисы
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+-- Цветовая схема
+local Colors = {
+    Accent = Color3.fromRGB(51, 255, 102),
+    Secondary = Color3.fromRGB(26, 204, 77),
+    Background = Color3.fromRGB(8, 13, 10),
+    Panel = Color3.fromRGB(15, 20, 18),
+    Hover = Color3.fromRGB(20, 31, 26),
+    Text = Color3.fromRGB(204, 230, 217)
+}
+
+-- Проверка на мобильное устройство
+local function IsMobile()
+    return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+end
+
+-- Создание GUI
+function MatrixGUI.new(name)
+    local self = setmetatable({}, MatrixGUI)
+    
+    -- Основной экран
+    self.ScreenGui = Instance.new("ScreenGui")
+    self.ScreenGui.Name = name or "MatrixGUI"
+    self.ScreenGui.ResetOnSpawn = false
+    self.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    -- Безопасное добавление в PlayerGui
+    local success = pcall(function()
+        self.ScreenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+    end)
+    
+    if not success then
+        -- Для эксплойтов
+        self.ScreenGui.Parent = game:GetService("CoreGui")
+    end
+    
+    -- Главное окно (адаптивный размер для мобильных)
+    self.MainFrame = Instance.new("Frame")
+    if IsMobile() then
+        self.MainFrame.Size = UDim2.new(0.9, 0, 0.8, 0)
+        self.MainFrame.Position = UDim2.new(0.05, 0, 0.1, 0)
+    else
+        self.MainFrame.Size = UDim2.new(0, 750, 0, 650)
+        self.MainFrame.Position = UDim2.new(0.5, -375, 0.5, -325)
+    end
+    self.MainFrame.BackgroundColor3 = Colors.Background
+    self.MainFrame.BorderSizePixel = 0
+    self.MainFrame.ClipsDescendants = true
+    self.MainFrame.Parent = self.ScreenGui
+    
+    -- Скругление углов
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = self.MainFrame
+    
+    -- Заголовок
+    self.TitleBar = Instance.new("Frame")
+    self.TitleBar.Size = UDim2.new(1, 0, 0, 50)
+    self.TitleBar.BackgroundColor3 = Colors.Panel
+    self.TitleBar.BorderSizePixel = 0
+    self.TitleBar.Parent = self.MainFrame
+    
+    self.TitleLabel = Instance.new("TextLabel")
+    self.TitleLabel.Text = "⬡ MATRIX.CC"
+    self.TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    self.TitleLabel.BackgroundTransparency = 1
+    self.TitleLabel.TextColor3 = Colors.Accent
+    self.TitleLabel.TextScaled = true
+    self.TitleLabel.Font = Enum.Font.SourceSansBold
+    self.TitleLabel.Parent = self.TitleBar
+    
+    -- Кнопка закрытия
+    self.CloseButton = Instance.new("TextButton")
+    self.CloseButton.Size = UDim2.new(0, 40, 0, 40)
+    self.CloseButton.Position = UDim2.new(1, -45, 0.5, -20)
+    self.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+    self.CloseButton.Text = "X"
+    self.CloseButton.TextColor3 = Color3.new(1, 1, 1)
+    self.CloseButton.TextScaled = true
+    self.CloseButton.Font = Enum.Font.SourceSansBold
+    self.CloseButton.Parent = self.TitleBar
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 4)
+    closeCorner.Parent = self.CloseButton
+    
+    self.CloseButton.MouseButton1Click:Connect(function()
+        self:Toggle()
+    end)
+    
+    -- Контейнер для элементов
+    self.Container = Instance.new("ScrollingFrame")
+    self.Container.Size = UDim2.new(1, -20, 1, -70)
+    self.Container.Position = UDim2.new(0, 10, 0, 60)
+    self.Container.BackgroundTransparency = 1
+    self.Container.ScrollBarThickness = IsMobile() and 8 or 4
+    self.Container.ScrollBarImageColor3 = Colors.Accent
+    self.Container.CanvasSize = UDim2.new(0, 0, 0, 0)
+    self.Container.Parent = self.MainFrame
+    
+    self.Layout = Instance.new("UIListLayout")
+    self.Layout.Padding = UDim.new(0, 10)
+    self.Layout.Parent = self.Container
+    
+    -- Автоматическое обновление размера канваса
+    self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        self.Container.CanvasSize = UDim2.new(0, 0, 0, self.Layout.AbsoluteContentSize.Y + 10)
+    end)
+    
+    -- Перетаскивание окна
+    self:MakeDraggable()
+    
+    self.Elements = {}
+    
+    return self
+end
+
+-- Функция для перетаскивания (поддержка тач и мыши)
+function MatrixGUI:MakeDraggable()
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    
+    local function startDrag(input)
+        dragging = true
+        dragStart = input.Position
+        startPos = self.MainFrame.Position
+    end
+    
+    local function updateDrag(input)
+        if dragging then
+            local delta = input.Position - dragStart
+            self.MainFrame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end
+    
+    local function endDrag()
+        dragging = false
+    end
+    
+    -- Поддержка мыши
+    self.TitleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            startDrag(input)
+        elseif input.UserInputType == Enum.UserInputType.Touch then
+            startDrag(input)
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            updateDrag(input)
+        elseif input.UserInputType == Enum.UserInputType.Touch then
+            updateDrag(input)
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            endDrag()
+        end
+    end)
+end
+
+-- Создание кнопки
+function MatrixGUI:Button(config)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, IsMobile() and 50 or 40)
+    button.BackgroundColor3 = Colors.Panel
+    button.BorderSizePixel = 0
+    button.Text = config.Name or "Button"
+    button.TextColor3 = Colors.Text
+    button.Font = Enum.Font.SourceSans
+    button.TextScaled = true
+    button.AutoButtonColor = false
+    button.Parent = self.Container
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = button
+    
+    -- Hover эффект
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Colors.Hover}):Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Colors.Panel}):Play()
+    end)
+    
+    -- Callback
+    if config.Callback then
+        button.MouseButton1Click:Connect(config.Callback)
+    end
+    
+    table.insert(self.Elements, button)
+    return button
+end
+
+-- Создание чекбокса
+function MatrixGUI:CheckBox(config)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, IsMobile() and 50 or 40)
+    frame.BackgroundColor3 = Colors.Panel
+    frame.BorderSizePixel = 0
+    frame.Parent = self.Container
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.7, -10, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "CheckBox"
+    label.TextColor3 = Colors.Text
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.SourceSans
+    label.TextScaled = true
+    label.Parent = frame
+    
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0, 60, 0, 30)
+    toggle.Position = UDim2.new(1, -70, 0.5, -15)
+    toggle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    toggle.BorderSizePixel = 0
+    toggle.Text = ""
+    toggle.AutoButtonColor = false
+    toggle.Parent = frame
+    
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 15)
+    toggleCorner.Parent = toggle
+    
+    local indicator = Instance.new("Frame")
+    indicator.Size = UDim2.new(0, 24, 0, 24)
+    indicator.Position = UDim2.new(0, 3, 0.5, -12)
+    indicator.BackgroundColor3 = Color3.fromRGB(77, 77, 77)
+    indicator.BorderSizePixel = 0
+    indicator.Parent = toggle
+    
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(0, 12)
+    indicatorCorner.Parent = indicator
+    
+    local enabled = config.Default or false
+    
+    local function updateToggle()
+        if enabled then
+            TweenService:Create(indicator, TweenInfo.new(0.2), {
+                Position = UDim2.new(1, -27, 0.5, -12),
+                BackgroundColor3 = Colors.Accent
+            }):Play()
+            TweenService:Create(toggle, TweenInfo.new(0.2), {
+                BackgroundColor3 = Colors.Secondary
+            }):Play()
+        else
+            TweenService:Create(indicator, TweenInfo.new(0.2), {
+                Position = UDim2.new(0, 3, 0.5, -12),
+                BackgroundColor3 = Color3.fromRGB(77, 77, 77)
+            }):Play()
+            TweenService:Create(toggle, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            }):Play()
+        end
+    end
+    
+    toggle.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        updateToggle()
+        
+        if enabled and config.On then
+            config.On()
+        elseif not enabled and config.Off then
+            config.Off()
+        end
+        
+        if config.Callback then
+            config.Callback(enabled)
+        end
+    end)
+    
+    updateToggle()
+    
+    table.insert(self.Elements, frame)
+    return {Frame = frame, Toggle = toggle, Enabled = function() return enabled end}
+end
+
+-- Создание слайдера
+function MatrixGUI:Slider(config)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, IsMobile() and 70 or 60)
+    frame.BackgroundColor3 = Colors.Panel
+    frame.BorderSizePixel = 0
+    frame.Parent = self.Container
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.5, -5, 0, 30)
+    label.Position = UDim2.new(0, 10, 0, 5)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "Slider"
+    label.TextColor3 = Colors.Text
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.SourceSans
+    label.TextScaled = true
+    label.Parent = frame
+    
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Size = UDim2.new(0.5, -10, 0, 30)
+    valueLabel.Position = UDim2.new(0.5, 0, 0, 5)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Text = tostring(config.Default or config.Min or 0)
+    valueLabel.TextColor3 = Colors.Accent
+    valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+    valueLabel.Font = Enum.Font.SourceSansBold
+    valueLabel.TextScaled = true
+    valueLabel.Parent = frame
+
+        local sliderBar = Instance.new("Frame")
+    sliderBar.Size = UDim2.new(1, -20, 0, 6)
+    sliderBar.Position = UDim2.new(0, 10, 1, -20)
+    sliderBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    sliderBar.BorderSizePixel = 0
+    sliderBar.Parent = frame
+    
+    local sliderCorner = Instance.new("UICorner")
+    sliderCorner.CornerRadius = UDim.new(0, 3)
+    sliderCorner.Parent = sliderBar
+    
+    local sliderFill = Instance.new("Frame")
+    sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
+    sliderFill.BackgroundColor3 = Colors.Accent
+    sliderFill.BorderSizePixel = 0
+    sliderFill.Parent = sliderBar
+    
+    local fillCorner = Instance.new("UICorner")
+    fillCorner.CornerRadius = UDim.new(0, 3)
+    fillCorner.Parent = sliderFill
+    
+    local sliderButton = Instance.new("TextButton")
+    sliderButton.Size = UDim2.new(0, 20, 0, 20)
+    sliderButton.Position = UDim2.new(0.5, -10, 0.5, -10)
+    sliderButton.BackgroundColor3 = Colors.Accent
+    sliderButton.BorderSizePixel = 0
+    sliderButton.Text = ""
+    sliderButton.AutoButtonColor = false
+    sliderButton.Parent = sliderBar
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 10)
+    buttonCorner.Parent = sliderButton
+    
+    local min = config.Min or 0
+    local max = config.Max or 100
+    local value = config.Default or min
+    
+    local function updateSlider(percent)
+        percent = math.clamp(percent, 0, 1)
+        sliderFill.Size = UDim2.new(percent, 0, 1, 0)
+        sliderButton.Position = UDim2.new(percent, -10, 0.5, -10)
+        
+        value = math.floor(min + (max - min) * percent + 0.5)
+        valueLabel.Text = tostring(value)
+        
+        if config.Callback then
+            config.Callback(value)
+        end
+    end
+    
+    local dragging = false
+    
+    local function startDrag()
+        dragging = true
+    end
+    
+    local function endDrag()
+        dragging = false
+    end
+    
+    local function updateDragPosition(input)
+        if dragging then
+            local relativeX = input.Position.X - sliderBar.AbsolutePosition.X
+            local percent = relativeX / sliderBar.AbsoluteSize.X
+            updateSlider(percent)
+        end
+    end
+    
+    -- Поддержка мыши и тача
+    sliderButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            startDrag()
+        end
+    end)
+    
+    sliderBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            startDrag()
+            updateDragPosition(input)
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            updateDragPosition(input)
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+           input.UserInputType == Enum.UserInputType.Touch then
+            endDrag()
+        end
+    end)
+    
+    updateSlider((value - min) / (max - min))
+    
+    table.insert(self.Elements, frame)
+    return {Frame = frame, Value = function() return value end, SetValue = updateSlider}
+end
+
+-- Создание текстового поля
+function MatrixGUI:TextBox(config)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, IsMobile() and 50 or 40)
+    frame.BackgroundColor3 = Colors.Panel
+    frame.BorderSizePixel = 0
+    frame.Parent = self.Container
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.4, -5, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "TextBox"
+    label.TextColor3 = Colors.Text
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.SourceSans
+    label.TextScaled = true
+    label.Parent = frame
+    
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(0.55, -10, 0.8, 0)
+    textBox.Position = UDim2.new(0.43, 0, 0.1, 0)
+    textBox.BackgroundColor3 = Colors.Background
+    textBox.BorderSizePixel = 0
+    textBox.Text = config.Default or ""
+    textBox.TextColor3 = Colors.Text
+    textBox.Font = Enum.Font.SourceSans
+    textBox.TextScaled = true
+    textBox.ClearTextOnFocus = false
+    textBox.Parent = frame
+    
+    local textCorner = Instance.new("UICorner")
+    textCorner.CornerRadius = UDim.new(0, 4)
+    textCorner.Parent = textBox
+    
+    if config.Callback then
+        textBox.FocusLost:Connect(function(enterPressed)
+            config.Callback(textBox.Text, enterPressed)
+        end)
+    end
+    
+    table.insert(self.Elements, frame)
+    return {Frame = frame, TextBox = textBox}
+end
+
+-- Создание выпадающего списка
+function MatrixGUI:Dropdown(config)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, IsMobile() and 50 or 40)
+    frame.BackgroundColor3 = Colors.Panel
+    frame.BorderSizePixel = 0
+    frame.Parent = self.Container
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = frame
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.4, -5, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "Dropdown"
+    label.TextColor3 = Colors.Text
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Font = Enum.Font.SourceSans
+    label.TextScaled = true
+    label.Parent = frame
+    
+    local dropButton = Instance.new("TextButton")
+    dropButton.Size = UDim2.new(0.55, -10, 0.8, 0)
+    dropButton.Position = UDim2.new(0.43, 0, 0.1, 0)
+    dropButton.BackgroundColor3 = Colors.Background
+    dropButton.BorderSizePixel = 0
+    dropButton.Text = config.Default or "Select"
+    dropButton.TextColor3 = Colors.Text
+    dropButton.Font = Enum.Font.SourceSans
+    dropButton.TextScaled = true
+    dropButton.AutoButtonColor = false
+    dropButton.Parent = frame
+    
+    local dropCorner = Instance.new("UICorner")
+    dropCorner.CornerRadius = UDim.new(0, 4)
+    dropCorner.Parent = dropButton
+    
+    local dropFrame = Instance.new("Frame")
+    dropFrame.Size = UDim2.new(0.55, -10, 0, #config.Options * 30)
+    dropFrame.Position = UDim2.new(0.43, 0, 1, 5)
+    dropFrame.BackgroundColor3 = Colors.Background
+    dropFrame.BorderSizePixel = 0
+    dropFrame.Visible = false
+    dropFrame.ZIndex = 10
+    dropFrame.Parent = frame
+    
+    local dropFrameCorner = Instance.new("UICorner")
+    dropFrameCorner.CornerRadius = UDim.new(0, 4)
+    dropFrameCorner.Parent = dropFrame
+    
+    local dropLayout = Instance.new("UIListLayout")
+    dropLayout.Parent = dropFrame
+    
+    local isOpen = false
+    
+    for _, option in ipairs(config.Options or {}) do
+        local optionButton = Instance.new("TextButton")
+        optionButton.Size = UDim2.new(1, 0, 0, 30)
+        optionButton.BackgroundColor3 = Colors.Panel
+        optionButton.BorderSizePixel = 0
+        optionButton.Text = option
+        optionButton.TextColor3 = Colors.Text
+        optionButton.Font = Enum.Font.SourceSans
+        optionButton.TextScaled = true
+        optionButton.AutoButtonColor = false
+        optionButton.Parent = dropFrame
+        
+        optionButton.MouseEnter:Connect(function()
+            optionButton.BackgroundColor3 = Colors.Hover
+        end)
+        
+        optionButton.MouseLeave:Connect(function()
+            optionButton.BackgroundColor3 = Colors.Panel
+        end)
+        
+        optionButton.MouseButton1Click:Connect(function()
+            dropButton.Text = option
+            dropFrame.Visible = false
+            isOpen = false
+            
+            if config.Callback then
+                config.Callback(option)
+            end
+        end)
+    end
+    
+    dropButton.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        dropFrame.Visible = isOpen
+    end)
+    
+    table.insert(self.Elements, frame)
+    return {Frame = frame, Selected = function() return dropButton.Text end}
+end
+
+-- Создание разделителя
+function MatrixGUI:Label(config)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 30)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "Label"
+    label.TextColor3 = Colors.Accent
+    label.Font = Enum.Font.SourceSansBold
+    label.TextScaled = true
+    label.Parent = self.Container
+    
+    table.insert(self.Elements, label)
+    return label
+end
+
+-- Создание разделителя
+function MatrixGUI:Separator()
+    local separator = Instance.new("Frame")
+    separator.Size = UDim2.new(1, -40, 0, 1)
+    separator.BackgroundColor3 = Colors.Accent
+    separator.BackgroundTransparency = 0.7
+    separator.BorderSizePixel = 0
+    separator.Parent = self.Container
+    
+    table.insert(self.Elements, separator)
+    return separator
+end
+
+-- Показать/скрыть GUI
+function MatrixGUI:Toggle()
+    self.MainFrame.Visible = not self.MainFrame.Visible
+end
+
+-- Показать GUI
+function MatrixGUI:Show()
+    self.MainFrame.Visible = true
+end
+
+-- Скрыть GUI
+function MatrixGUI:Hide()
+    self.MainFrame.Visible = false
+end
+
+-- Уничтожить GUI
+function MatrixGUI:Destroy()
+    self.ScreenGui:Destroy()
+end
+
+-- Получить все элементы
+function MatrixGUI:GetElements()
+    return self.Elements
+end
+
+-- Очистить все элементы
+function MatrixGUI:Clear()
+    for _, element in ipairs(self.Elements) do
+        element:Destroy()
+    end
+    self.Elements = {}
+end
+
+return MatrixGUI
+    
