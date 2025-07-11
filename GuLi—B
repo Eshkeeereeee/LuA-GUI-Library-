@@ -7,6 +7,10 @@ _G.ModernDarkGUILib_v3 = Library
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
+
+-- Определяем мобильное устройство
+local IsMobile = UserInputService.TouchEnabled and not UserInputService.MouseEnabled
 
 -- // ОБНОВЛЕННАЯ ПРЕМИУМ ТЕМА //
 local Theme = {
@@ -14,7 +18,7 @@ local Theme = {
     ContentBackground = Color3.fromRGB(24, 24, 28),
     Secondary = Color3.fromRGB(32, 32, 38),
     Tertiary = Color3.fromRGB(40, 40, 46),
-    Accent = Color3.fromRGB(88, 101, 242), -- Discord-style blue
+    Accent = Color3.fromRGB(88, 101, 242),
     AccentGlow = Color3.fromRGB(114, 137, 255),
     Success = Color3.fromRGB(87, 242, 135),
     Error = Color3.fromRGB(240, 71, 71),
@@ -23,10 +27,10 @@ local Theme = {
     MutedText = Color3.fromRGB(110, 110, 115),
     Font = Enum.Font.Gotham,
     TitleFont = Enum.Font.GothamBold,
-    TextSize = 14,
-    TitleSize = 18,
+    TextSize = IsMobile and 16 or 14,
+    TitleSize = IsMobile and 20 or 18,
     Rounding = 12,
-    Padding = 15,
+    Padding = IsMobile and 18 or 15,
     Shadow = Color3.fromRGB(10, 10, 12)
 }
 
@@ -42,7 +46,7 @@ local function CreateGradient(parent, color1, color2, rotation)
 end
 
 local function CreateShadow(parent, transparency)
-    local shadow = Instance.new("ImageLabel", parent)
+    local shadow = Instance.new("ImageLabel", parent.Parent)
     shadow.Name = "Shadow"
     shadow.AnchorPoint = Vector2.new(0.5, 0.5)
     shadow.Position = UDim2.new(0.5, 0, 0.5, 4)
@@ -60,36 +64,35 @@ end
 -- // ПЕРЕПИСАННАЯ ФУНКЦИЯ ПЕРЕТАСКИВАНИЯ //
 local function MakeDraggable(element, handle)
     local dragStart, startPos
-    local lastInput, lastInputTime
     local dragging = false
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        element.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
 
     handle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = element.Position
-            lastInput = input.Position
-            lastInputTime = tick()
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            element.Position = UDim2.new(
-                startPos.X.Scale,
-                startPos.X.Offset + delta.X,
-                startPos.Y.Scale,
-                startPos.Y.Offset + delta.Y
-            )
-            lastInput = input.Position
-            lastInputTime = tick()
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
+            update(input)
         end
     end)
 end
@@ -100,27 +103,30 @@ function Library:CreateWindow(title)
     local Components = {}
     Components.Tabs = {}
 
-    -- Получаем ScreenGui
+    -- Создаем ScreenGui
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "ModernGUILib"
     screenGui.ResetOnSpawn = false
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.DisplayOrder = 999999 -- Высокий приоритет для мобильных устройств
     screenGui.Parent = gethui and gethui() or game:GetService("CoreGui")
 
+    -- Основное окно
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0, 550, 0, 380)
-    MainFrame.Position = UDim2.new(0.5, -275, 0.5, -190)
+    MainFrame.Size = IsMobile and UDim2.new(0.9, 0, 0.8, 0) or UDim2.new(0, 550, 0, 380)
+    MainFrame.Position = IsMobile and UDim2.new(0.05, 0, 0.1, 0) or UDim2.new(0.5, -275, 0.5, -190)
     MainFrame.BackgroundColor3 = Theme.Background
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = false
     MainFrame.Parent = screenGui
+    MainFrame.Active = true
     
     local MainCorner = Instance.new("UICorner", MainFrame)
     MainCorner.CornerRadius = UDim.new(0, Theme.Rounding)
     
-    -- Добавляем тень
-    CreateShadow(MainFrame, 0.3)
+    -- Тень главного окна
+    local MainShadow = CreateShadow(MainFrame, 0.3)
     
     -- Градиентная обводка
     local GlowStroke = Instance.new("UIStroke", MainFrame)
@@ -140,6 +146,7 @@ function Library:CreateWindow(title)
     spawn(function()
         while MainFrame.Parent do
             for i = 0, 360, 2 do
+                if not MainFrame.Parent then break end
                 StrokeGradient.Rotation = i
                 wait(0.05)
             end
@@ -149,7 +156,7 @@ function Library:CreateWindow(title)
     -- Header
     local Header = Instance.new("Frame", MainFrame)
     Header.Name = "Header"
-    Header.Size = UDim2.new(1, 0, 0, 50)
+    Header.Size = UDim2.new(1, 0, 0, IsMobile and 60 or 50)
     Header.BackgroundColor3 = Theme.Background
     Header.BorderSizePixel = 0
 
@@ -173,8 +180,8 @@ function Library:CreateWindow(title)
 
     -- Контролы
     local ControlsFrame = Instance.new("Frame", Header)
-    ControlsFrame.Size = UDim2.new(0, 90, 1, 0)
-    ControlsFrame.Position = UDim2.new(1, -90 - Theme.Padding, 0, 0)
+    ControlsFrame.Size = UDim2.new(0, IsMobile and 110 or 90, 1, 0)
+    ControlsFrame.Position = UDim2.new(1, -(IsMobile and 110 or 90) - Theme.Padding, 0, 0)
     ControlsFrame.BackgroundTransparency = 1
     
     local ControlsLayout = Instance.new("UIListLayout", ControlsFrame)
@@ -186,7 +193,7 @@ function Library:CreateWindow(title)
     -- Кнопка сворачивания
     local HideButton = Instance.new("TextButton", ControlsFrame)
     HideButton.Name = "HideButton"
-    HideButton.Size = UDim2.new(0, 38, 0, 38)
+    HideButton.Size = UDim2.new(0, IsMobile and 48 or 38, 0, IsMobile and 48 or 38)
     HideButton.BackgroundColor3 = Theme.Secondary
     HideButton.Text = ""
     HideButton.AutoButtonColor = false
@@ -194,17 +201,17 @@ function Library:CreateWindow(title)
     HideCorner.CornerRadius = UDim.new(0, 10)
     
     local HideIcon = Instance.new("ImageLabel", HideButton)
-    HideIcon.Size = UDim2.new(0, 20, 0, 20)
+    HideIcon.Size = UDim2.new(0, IsMobile and 24 or 20, 0, IsMobile and 24 or 20)
     HideIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     HideIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     HideIcon.BackgroundTransparency = 1
-    HideIcon.Image = "rbxassetid://7072719338" -- Minimize icon
+    HideIcon.Image = "rbxassetid://7072719338"
     HideIcon.ImageColor3 = Theme.SubText
 
     -- Кнопка закрытия
     local CloseButton = Instance.new("TextButton", ControlsFrame)
     CloseButton.Name = "CloseButton"
-    CloseButton.Size = UDim2.new(0, 38, 0, 38)
+    CloseButton.Size = UDim2.new(0, IsMobile and 48 or 38, 0, IsMobile and 48 or 38)
     CloseButton.BackgroundColor3 = Theme.Secondary
     CloseButton.Text = ""
     CloseButton.AutoButtonColor = false
@@ -212,11 +219,11 @@ function Library:CreateWindow(title)
     CloseCorner.CornerRadius = UDim.new(0, 10)
     
     local CloseIcon = Instance.new("ImageLabel", CloseButton)
-    CloseIcon.Size = UDim2.new(0, 20, 0, 20)
+    CloseIcon.Size = UDim2.new(0, IsMobile and 24 or 20, 0, IsMobile and 24 or 20)
     CloseIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     CloseIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     CloseIcon.BackgroundTransparency = 1
-    CloseIcon.Image = "rbxassetid://7072725504" -- X icon
+    CloseIcon.Image = "rbxassetid://7072725504"
     CloseIcon.ImageColor3 = Theme.SubText
 
     -- Эффекты при наведении
@@ -231,19 +238,22 @@ function Library:CreateWindow(title)
         end)
     end
 
-    AddHoverEffect(HideButton, HideIcon)
-    AddHoverEffect(CloseButton, CloseIcon)
+    if not IsMobile then
+        AddHoverEffect(HideButton, HideIcon)
+        AddHoverEffect(CloseButton, CloseIcon)
+    end
 
     -- Контент
     local ContentContainer = Instance.new("Frame", MainFrame)
-    ContentContainer.Size = UDim2.new(1, 0, 1, -50)
-    ContentContainer.Position = UDim2.new(0, 0, 0, 50)
+    ContentContainer.Size = UDim2.new(1, 0, 1, -(IsMobile and 60 or 50))
+    ContentContainer.Position = UDim2.new(0, 0, 0, IsMobile and 60 or 50)
     ContentContainer.BackgroundTransparency = 1
 
     local TabsPanel = Instance.new("Frame", ContentContainer)
-    TabsPanel.Size = UDim2.new(0, 150, 1, -Theme.Padding)
+    TabsPanel.Size = UDim2.new(0, IsMobile and 120 or 150, 1, -Theme.Padding)
     TabsPanel.Position = UDim2.new(0, Theme.Padding, 0, Theme.Padding/2)
     TabsPanel.BackgroundTransparency = 1
+    TabsPanel.Visible = not IsMobile -- Скрываем табы на мобильных по умолчанию
     
     local TabsList = Instance.new("ScrollingFrame", TabsPanel)
     TabsList.Size = UDim2.new(1, 0, 1, 0)
@@ -257,44 +267,54 @@ function Library:CreateWindow(title)
     TabsLayout.Padding = UDim.new(0, 6)
     
     local ContentPanel = Instance.new("Frame", ContentContainer)
-    ContentPanel.Size = UDim2.new(1, -150 - Theme.Padding * 3, 1, -Theme.Padding)
-    ContentPanel.Position = UDim2.new(0, 150 + Theme.Padding * 2, 0, Theme.Padding/2)
+    ContentPanel.Size = IsMobile and UDim2.new(1, -Theme.Padding * 2, 1, -Theme.Padding) or UDim2.new(1, -150 - Theme.Padding * 3, 1, -Theme.Padding)
+    ContentPanel.Position = IsMobile and UDim2.new(0, Theme.Padding, 0, Theme.Padding/2) or UDim2.new(0, 150 + Theme.Padding * 2, 0, Theme.Padding/2)
     ContentPanel.BackgroundColor3 = Theme.ContentBackground
     ContentPanel.BorderSizePixel = 0
     
     local ContentCorner = Instance.new("UICorner", ContentPanel)
     ContentCorner.CornerRadius = UDim.new(0, Theme.Rounding)
     
-    CreateShadow(ContentPanel, 0.2)
+    local ContentShadow = CreateShadow(ContentPanel, 0.2)
     
     -- КНОПКА ОТКРЫТИЯ С ФИКСИРОВАННОЙ ПОЗИЦИЕЙ
     local OpenButton = Instance.new("TextButton", screenGui)
-    OpenButton.Size = UDim2.new(0, 55, 0, 55)
-    OpenButton.Position = UDim2.new(0, 60, 0, 20) -- Фиксированная позиция: 60px слева, 20px сверху
+    OpenButton.Name = "OpenButton"
+    OpenButton.Size = UDim2.new(0, IsMobile and 70 or 55, 0, IsMobile and 70 or 55)
+    OpenButton.Position = UDim2.new(0, IsMobile and 20 or 60, 0, IsMobile and 60 or 20)
     OpenButton.BackgroundColor3 = Theme.Secondary
     OpenButton.Text = ""
     OpenButton.Visible = false
-    OpenButton.ZIndex = 999
+    OpenButton.Active = true
+    OpenButton.ZIndex = 999999
     OpenButton.AutoButtonColor = false
     
     local OpenCorner = Instance.new("UICorner", OpenButton)
     OpenCorner.CornerRadius = UDim.new(0.5, 0)
     
-    CreateShadow(OpenButton, 0.4)
+    local OpenShadow = CreateShadow(OpenButton, 0.4)
+    OpenShadow.ZIndex = 999998
     
     local OpenStroke = Instance.new("UIStroke", OpenButton)
     OpenStroke.Color = Theme.Accent
-    OpenStroke.Thickness = 2
+    OpenStroke.Thickness = IsMobile and 3 or 2
     OpenStroke.Transparency = 0.7
     
     local OpenIcon = Instance.new("ImageLabel", OpenButton)
-    OpenIcon.Image = "rbxassetid://7072718683" -- Menu icon
+    OpenIcon.Image = "rbxassetid://7072718683"
     OpenIcon.Size = UDim2.new(0.55, 0, 0.55, 0)
     OpenIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     OpenIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     OpenIcon.BackgroundTransparency = 1
     OpenIcon.ImageColor3 = Theme.AccentGlow
-    
+
+    -- Делаем кнопку открытия интерактивной на мобильных
+    if IsMobile then
+        OpenButton.TouchTap:Connect(function()
+            OpenButton.MouseButton1Click:Fire()
+        end)
+    end
+
     -- Анимация пульсации для кнопки открытия
     spawn(function()
         while OpenButton.Parent do
@@ -310,6 +330,9 @@ function Library:CreateWindow(title)
     end)
 
     MakeDraggable(MainFrame, Header)
+    if not IsMobile then
+        MakeDraggable(OpenButton, OpenButton)
+    end
 
     -- АНИМИРОВАННАЯ ЛОГИКА СКРЫТИЯ/ПОКАЗА
     local originalSize = MainFrame.Size
@@ -320,11 +343,16 @@ function Library:CreateWindow(title)
         if isAnimating then return end
         isAnimating = true
         originalPosition = MainFrame.Position
+        originalSize = MainFrame.Size
 
         -- Анимация исчезновения контента
         for _, child in pairs(ContentContainer:GetDescendants()) do
             if child:IsA("GuiObject") then
-                TweenService:Create(child, TweenInfo.new(0.15), {BackgroundTransparency = 1, TextTransparency = 1, ImageTransparency = 1}):Play()
+                TweenService:Create(child, TweenInfo.new(0.15), {
+                    BackgroundTransparency = 1,
+                    TextTransparency = 1,
+                    ImageTransparency = 1
+                }):Play()
             end
         end
         
@@ -332,12 +360,16 @@ function Library:CreateWindow(title)
         
         -- Анимация сворачивания
         local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+        local targetSize = UDim2.new(0, IsMobile and 70 or 55, 0, IsMobile and 70 or 55)
+        local targetPos = OpenButton.Position
+        
         TweenService:Create(MainFrame, tweenInfo, {
-            Size = UDim2.new(0, 55, 0, 55),
-            Position = UDim2.new(0, 60, 0, 20) -- Та же позиция, что и у кнопки открытия
+            Size = targetSize,
+            Position = targetPos
         }):Play()
         TweenService:Create(MainCorner, tweenInfo, {CornerRadius = UDim.new(0.5, 0)}):Play()
         TweenService:Create(GlowStroke, TweenInfo.new(0.2), {Transparency = 1}):Play()
+        TweenService:Create(MainShadow, TweenInfo.new(0.2), {ImageTransparency = 1}):Play()
         
         wait(0.4)
         MainFrame.Visible = false
@@ -350,7 +382,7 @@ function Library:CreateWindow(title)
         isAnimating = true
         
         MainFrame.Position = OpenButton.Position
-        MainFrame.Size = UDim2.new(0, 55, 0, 55)
+        MainFrame.Size = UDim2.new(0, IsMobile and 70 or 55, 0, IsMobile and 70 or 55)
         MainCorner.CornerRadius = UDim.new(0.5, 0)
         MainFrame.Visible = true
         OpenButton.Visible = false
@@ -363,6 +395,7 @@ function Library:CreateWindow(title)
         }):Play()
         TweenService:Create(MainCorner, tweenInfo, {CornerRadius = UDim.new(0, Theme.Rounding)}):Play()
         TweenService:Create(GlowStroke, TweenInfo.new(0.3), {Transparency = 0.5}):Play()
+        TweenService:Create(MainShadow, TweenInfo.new(0.3), {ImageTransparency = 0.3}):Play()
         
         wait(0.3)
         
@@ -370,15 +403,30 @@ function Library:CreateWindow(title)
         for _, child in pairs(ContentContainer:GetDescendants()) do
             if child:IsA("TextLabel") or child:IsA("TextButton") then
                 TweenService:Create(child, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
-            elseif child:IsA("Frame") then
-                TweenService:Create(child, TweenInfo.new(0.2), {BackgroundTransparency = child.Name == "Shadow" and 1 or 0}):Play()
+            elseif child:IsA("Frame") and child.Name ~= "Shadow" then
+                TweenService:Create(child, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
             elseif child:IsA("ImageLabel") or child:IsA("ImageButton") then
-                TweenService:Create(child, TweenInfo.new(0.2), {ImageTransparency = 0}):Play()
+                if child.Name ~= "Shadow" then
+                    TweenService:Create(child, TweenInfo.new(0.2), {ImageTransparency = 0}):Play()
+                end
+            elseif child:IsA("ScrollingFrame") then
+                TweenService:Create(child, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
             end
         end
         
         isAnimating = false
     end)
+
+    -- Для мобильных устройств
+    if IsMobile then
+        HideButton.TouchTap:Connect(function()
+            HideButton.MouseButton1Click:Fire()
+        end)
+        
+        CloseButton.TouchTap:Connect(function()
+            CloseButton.MouseButton1Click:Fire()
+        end)
+    end
 
     CloseButton.MouseButton1Click:Connect(function()
         -- Анимация закрытия
@@ -412,18 +460,44 @@ function Library:CreateWindow(title)
         tabToSelect.Indicator:TweenSize(UDim2.new(0, 4, 0.6, 0), "Out", "Back", 0.3, true)
     end
 
+    -- Кнопка переключения табов для мобильных
+    if IsMobile then
+        local TabToggle = Instance.new("TextButton", ContentPanel)
+        TabToggle.Size = UDim2.new(1, -20, 0, 40)
+        TabToggle.Position = UDim2.new(0, 10, 0, 5)
+        TabToggle.BackgroundColor3 = Theme.Secondary
+        TabToggle.Text = "☰ Tabs"
+        TabToggle.TextColor3 = Theme.Text
+        TabToggle.Font = Theme.Font
+        TabToggle.TextSize = Theme.TextSize
+        TabToggle.AutoButtonColor = false
+        Instance.new("UICorner", TabToggle).CornerRadius = UDim.new(0, 8)
+        
+        TabToggle.MouseButton1Click:Connect(function()
+            TabsPanel.Visible = not TabsPanel.Visible
+            if TabsPanel.Visible then
+                ContentPanel:TweenPosition(UDim2.new(0, 120 + Theme.Padding * 2, 0, Theme.Padding/2), "Out", "Quad", 0.3, true)
+                ContentPanel:TweenSize(UDim2.new(1, -120 - Theme.Padding * 3, 1, -Theme.Padding), "Out", "Quad", 0.3, true)
+            else
+                ContentPanel:TweenPosition(UDim2.new(0, Theme.Padding, 0, Theme.Padding/2), "Out", "Quad", 0.3, true)
+                ContentPanel:TweenSize(UDim2.new(1, -Theme.Padding * 2, 1, -Theme.Padding), "Out", "Quad", 0.3, true)
+            end
+        end)
+    end
+
     function Window:AddTab(tabName)
         local Tab = {}
         
         -- Контент вкладки
         local TabContentFrame = Instance.new("ScrollingFrame", ContentPanel)
         TabContentFrame.Name = tabName .. "_Content"
-        TabContentFrame.Size = UDim2.new(1, 0, 1, 0)
+        TabContentFrame.Size = UDim2.new(1, 0, 1, IsMobile and -50 or 0)
+        TabContentFrame.Position = UDim2.new(0, 0, 0, IsMobile and 50 or 0)
         TabContentFrame.BackgroundTransparency = 1
         TabContentFrame.BorderSizePixel = 0
         TabContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
         TabContentFrame.ScrollBarImageColor3 = Theme.Accent
-        TabContentFrame.ScrollBarThickness = 4
+        TabContentFrame.ScrollBarThickness = IsMobile and 6 or 4
         TabContentFrame.Visible = false
         TabContentFrame.ScrollBarImageTransparency = 0.5
         
@@ -436,7 +510,7 @@ function Library:CreateWindow(title)
         -- Кнопка вкладки
         local TabButton = Instance.new("TextButton", TabsList)
         TabButton.Name = tabName .. "_Button"
-        TabButton.Size = UDim2.new(1, 0, 0, 42)
+        TabButton.Size = UDim2.new(1, 0, 0, IsMobile and 50 or 42)
         TabButton.BackgroundTransparency = 1
         TabButton.BackgroundColor3 = Theme.Secondary
         TabButton.Text = tabName
@@ -469,20 +543,35 @@ function Library:CreateWindow(title)
         local tabObject = { Button = TabButton, Content = TabContentFrame, Indicator = Indicator }
         table.insert(Components.Tabs, tabObject)
         
-        TabButton.MouseButton1Click:Connect(function() SelectTab(tabObject) end)
+        TabButton.MouseButton1Click:Connect(function()
+            SelectTab(tabObject)
+            if IsMobile and TabsPanel.Visible then
+                TabsPanel.Visible = false
+                ContentPanel:TweenPosition(UDim2.new(0, Theme.Padding, 0, Theme.Padding/2), "Out", "Quad", 0.3, true)
+                ContentPanel:TweenSize(UDim2.new(1, -Theme.Padding * 2, 1, -Theme.Padding), "Out", "Quad", 0.3, true)
+            end
+        end)
+        
+        if IsMobile then
+            TabButton.TouchTap:Connect(function()
+                TabButton.MouseButton1Click:Fire()
+            end)
+        end
         
         -- Эффект при наведении
-        TabButton.MouseEnter:Connect(function()
-            if not TabContentFrame.Visible then
-                TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Theme.SubText}):Play()
-            end
-        end)
-        
-        TabButton.MouseLeave:Connect(function()
-            if not TabContentFrame.Visible then
-                TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Theme.MutedText}):Play()
-            end
-        end)
+        if not IsMobile then
+            TabButton.MouseEnter:Connect(function()
+                if not TabContentFrame.Visible then
+                    TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Theme.SubText}):Play()
+                end
+            end)
+            
+            TabButton.MouseLeave:Connect(function()
+                if not TabContentFrame.Visible then
+                    TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = Theme.MutedText}):Play()
+                end
+            end)
+        end
         
         if #Components.Tabs == 1 then
             task.defer(SelectTab, tabObject)
@@ -511,7 +600,7 @@ function Library:CreateWindow(title)
         
         function Tab:AddButton(text, callback)
             local button = Instance.new("TextButton", TabContentFrame)
-            button.Size = UDim2.new(1, 0, 0, 42)
+            button.Size = UDim2.new(1, 0, 0, IsMobile and 50 or 42)
             button.BackgroundColor3 = Theme.Secondary
             button.Font = Theme.Font
             button.Text = text
@@ -526,13 +615,19 @@ function Library:CreateWindow(title)
             
             button.MouseButton1Click:Connect(callback or function() end)
             
-            button.MouseEnter:Connect(function()
-                TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Tertiary}):Play()
-            end)
-            
-            button.MouseLeave:Connect(function()
-                TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Secondary}):Play()
-            end)
+            if IsMobile then
+                button.TouchTap:Connect(function()
+                    button.MouseButton1Click:Fire()
+                end)
+            else
+                button.MouseEnter:Connect(function()
+                    TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Tertiary}):Play()
+                end)
+                
+                button.MouseLeave:Connect(function()
+                    TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = Theme.Secondary}):Play()
+                end)
+            end
             
             UpdateCanvasSize()
             return button
@@ -543,7 +638,7 @@ function Library:CreateWindow(title)
             local state = false
             
             local toggleFrame = Instance.new("Frame", TabContentFrame)
-            toggleFrame.Size = UDim2.new(1, 0, 0, 42)
+            toggleFrame.Size = UDim2.new(1, 0, 0, IsMobile and 50 or 42)
             toggleFrame.BackgroundTransparency = 1
             
             local toggleButton = Instance.new("TextButton", toggleFrame)
@@ -562,7 +657,7 @@ function Library:CreateWindow(title)
             toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
             
             local switch = Instance.new("Frame", toggleFrame)
-            switch.Size = UDim2.new(0, 52, 0, 28)
+            switch.Size = UDim2.new(0, IsMobile and 60 or 52, 0, IsMobile and 32 or 28)
             switch.Position = UDim2.new(1, 0, 0.5, 0)
             switch.AnchorPoint = Vector2.new(1, 0.5)
             switch.BackgroundColor3 = Theme.Secondary
@@ -572,7 +667,7 @@ function Library:CreateWindow(title)
             SwitchCorner.CornerRadius = UDim.new(1, 0)
             
             local knob = Instance.new("Frame", switch)
-            knob.Size = UDim2.new(0, 22, 0, 22)
+            knob.Size = UDim2.new(0, IsMobile and 26 or 22, 0, IsMobile and 26 or 22)
             knob.Position = UDim2.new(0, 3, 0.5, 0)
             knob.AnchorPoint = Vector2.new(0, 0.5)
             knob.BackgroundColor3 = Theme.MutedText
@@ -583,7 +678,7 @@ function Library:CreateWindow(title)
             
             CreateShadow(knob, 0.8)
             
-            toggleButton.MouseButton1Click:Connect(function()
+            local function toggle()
                 state = not state
                 pcall(callback, state)
                 
@@ -602,7 +697,13 @@ function Library:CreateWindow(title)
                     }):Play()
                     TweenService:Create(switch, TweenInfo.new(0.3), {BackgroundColor3 = Theme.Secondary}):Play()
                 end
-            end)
+            end
+            
+            toggleButton.MouseButton1Click:Connect(toggle)
+            
+            if IsMobile then
+                toggleButton.TouchTap:Connect(toggle)
+            end
             
             UpdateCanvasSize()
             return toggleFrame
@@ -610,7 +711,7 @@ function Library:CreateWindow(title)
         
         function Tab:AddTextbox(placeholder, callback)
             local textbox = Instance.new("TextBox", TabContentFrame)
-            textbox.Size = UDim2.new(1, 0, 0, 42)
+            textbox.Size = UDim2.new(1, 0, 0, IsMobile and 50 or 42)
             textbox.BackgroundColor3 = Theme.Secondary
             textbox.Font = Theme.Font
             textbox.PlaceholderText = placeholder
@@ -655,12 +756,13 @@ function Library:CreateWindow(title)
         
         function Tab:AddToggleWithTextbox(text, toggleCallback, textboxCallback)
             local container = Instance.new("Frame", TabContentFrame)
-            container.Size = UDim2.new(1, 0, 0, 42)
+            container.Size = UDim2.new(1, 0, 0, IsMobile and 50 or 42)
             container.BackgroundTransparency = 1
             
             local toggle = Tab:AddToggle(text, function(state)
                 pcall(toggleCallback or function() end, state)
-                container.Size = state and UDim2.new(1, 0, 0, 96) or UDim2.new(1, 0, 0, 42)
+                local targetSize = state and UDim2.new(1, 0, 0, IsMobile and 110 or 96) or UDim2.new(1, 0, 0, IsMobile and 50 or 42)
+                TweenService:Create(container, TweenInfo.new(0.3), {Size = targetSize}):Play()
                 textbox.Visible = state
                 UpdateCanvasSize()
             end)
@@ -668,7 +770,7 @@ function Library:CreateWindow(title)
             
             local textbox = Tab:AddTextbox("Enter value...", textboxCallback)
             textbox.Parent = container
-            textbox.Position = UDim2.new(0, 0, 0, 54)
+            textbox.Position = UDim2.new(0, 0, 0, IsMobile and 60 or 54)
             textbox.Visible = false
             
             UpdateCanvasSize()
