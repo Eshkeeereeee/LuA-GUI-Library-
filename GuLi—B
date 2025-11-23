@@ -8,308 +8,233 @@ function Library:CreateWindow(HubName)
 	local LocalPlayer = game.Players.LocalPlayer
 	local Mouse = LocalPlayer:GetMouse()
 
-	--// Main UI Setup (Твой GUI код, очищенный от лишних кнопок)
+	--// GUI Creation
 	local retace = Instance.new("ScreenGui")
 	local WaterMark = Instance.new("Frame")
 	local WaterMark_2 = Instance.new("Frame")
 	local UICorner = Instance.new("UICorner")
 	local UIGradient = Instance.new("UIGradient")
 	local TextLabel = Instance.new("TextLabel")
-	local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-	local UICorner_2 = Instance.new("UICorner")
-	local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
 	local OpEn = Instance.new("Frame")
 	local backraund = Instance.new("Frame")
 	local UICorner_3 = Instance.new("UICorner")
 	local OpenClose = Instance.new("TextButton")
 	local UICorner_4 = Instance.new("UICorner")
-	local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
-	local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
 	local UICorner_5 = Instance.new("UICorner")
 	local UIGradient_2 = Instance.new("UIGradient")
-	local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
 	local TAB = Instance.new("Frame")
 	local UICorner_6 = Instance.new("UICorner")
 	local TABline = Instance.new("Frame")
 	local UICorner_7 = Instance.new("UICorner")
 	local TABline_2 = Instance.new("Frame")
 	local UICorner_8 = Instance.new("UICorner")
-	local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
 	local Name = Instance.new("TextLabel")
-	local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
-	local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 	local MenuBackround = Instance.new("Frame")
 	local UICorner_9 = Instance.new("UICorner")
 	local Close = Instance.new("TextButton")
 	local UICorner_10 = Instance.new("UICorner")
-	local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
 	local PageList = Instance.new("ScrollingFrame")
 	local UICorner_11 = Instance.new("UICorner")
 	local UIPageLayout = Instance.new("UIPageLayout")
-	local grt = Instance.new("Frame")
-	local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
-	local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
 	local bckMenu = Instance.new("Frame")
 	local functionable1menu = Instance.new("Folder")
-	local UIPageLayout_4 = Instance.new("UIPageLayout")
-	local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+	local UIPageLayout_Content = Instance.new("UIPageLayout")
 	local PAGEline = Instance.new("Frame")
 	local UICorner_21 = Instance.new("UICorner")
-	local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
-	local UIAspectRatioConstraint_19 = Instance.new("UIAspectRatioConstraint")
-	local UIAspectRatioConstraint_20 = Instance.new("UIAspectRatioConstraint")
 
-	--// Properties Setting
-	retace.Name = "retace"
-	retace.Parent = game.CoreGui -- Или game.Players.LocalPlayer.PlayerGui
+	--// Properties
+	retace.Name = "NymaUI"
+	retace.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 	retace.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	retace.DisplayOrder = 999999999
+	retace.DisplayOrder = 100
+	retace.ResetOnSpawn = false
 
+	-- Watermark
 	WaterMark.Name = "WaterMark"
 	WaterMark.Parent = retace
 	WaterMark.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 	WaterMark.BackgroundTransparency = 0.340
-	WaterMark.Position = UDim2.new(0.00795, 0, 0.01184, 0)
+	WaterMark.Position = UDim2.new(0.008, 0, 0.012, 0)
 	WaterMark.Size = UDim2.new(0, 103, 0, 18)
-	WaterMark.ZIndex = 999999999
-
-	WaterMark_2.Name = "WaterMark"
+	
 	WaterMark_2.Parent = WaterMark
 	WaterMark_2.BackgroundColor3 = Color3.fromRGB(157, 76, 255)
 	WaterMark_2.BackgroundTransparency = 0.090
-	WaterMark_2.Position = UDim2.new(-0.0125, 0, 0.01184, 0)
+	WaterMark_2.Position = UDim2.new(-0.012, 0, 0.012, 0)
 	WaterMark_2.Size = UDim2.new(0, 8, 0, 25)
-	WaterMark_2.ZIndex = 999999999
-
 	UICorner.CornerRadius = UDim.new(0, 4)
 	UICorner.Parent = WaterMark_2
-
-	UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(200, 1, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(81, 45, 190))}
+	
+	UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 1, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(81, 45, 190))}
 	UIGradient.Rotation = 90
 	UIGradient.Parent = WaterMark_2
 
 	TextLabel.Parent = WaterMark
-	TextLabel.BackgroundTransparency = 1.000
-	TextLabel.Position = UDim2.new(0, 0, 0.01184, 0)
+	TextLabel.BackgroundTransparency = 1
 	TextLabel.Size = UDim2.new(0, 103, 0, 17)
-	TextLabel.ZIndex = 999999999
 	TextLabel.Font = Enum.Font.SourceSansBold
 	TextLabel.Text = HubName or "Nyma | PREMIUM"
 	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel.TextSize = 14.000
+	TextLabel.TextSize = 14
 	TextLabel.TextTransparency = 0.260
-
-	UIAspectRatioConstraint.Parent = TextLabel
-	UIAspectRatioConstraint.AspectRatio = 6.059
 	UICorner_2.CornerRadius = UDim.new(0, 4)
 	UICorner_2.Parent = WaterMark
-	UIAspectRatioConstraint_2.Parent = WaterMark
-	UIAspectRatioConstraint_2.AspectRatio = 5.722
 
+	-- Open/Close Button (Small Square)
 	OpEn.Name = "OpEn"
 	OpEn.Parent = retace
 	OpEn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	OpEn.Position = UDim2.new(0.4847, 0, 0.0200, 0)
+	OpEn.Position = UDim2.new(0.48, 0, 0.02, 0) -- Center top for mobile
 	OpEn.Size = UDim2.new(0, 40, 0, 31)
-	OpEn.ZIndex = 999999999
+	UICorner_5.CornerRadius = UDim.new(0, 4)
+	UICorner_5.Parent = OpEn
+	UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 0, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(43, 13, 104))}
+	UIGradient_2.Rotation = 36
+	UIGradient_2.Parent = OpEn
 
 	backraund.Name = "backraund"
 	backraund.Parent = OpEn
 	backraund.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
 	backraund.ClipsDescendants = true
-	backraund.Position = UDim2.new(0.1645, 0, 0.0717, 0)
+	backraund.Position = UDim2.new(0.16, 0, 0.07, 0)
 	backraund.Size = UDim2.new(0, 26, 0, 26)
-	backraund.ZIndex = 999999999
 	UICorner_3.CornerRadius = UDim.new(0, 4)
 	UICorner_3.Parent = backraund
 
 	OpenClose.Name = "OpenClose"
 	OpenClose.Parent = backraund
-	OpenClose.BackgroundTransparency = 1.000
-	OpenClose.Position = UDim2.new(-0.0424, 0, -0.0437, 0)
-	OpenClose.Size = UDim2.new(0, 28, 0, 28)
-	OpenClose.ZIndex = 999999999
-	OpenClose.Font = Enum.Font.Unknown
-	OpenClose.Text = "End"
+	OpenClose.BackgroundTransparency = 1
+	OpenClose.Size = UDim2.new(1, 0, 1, 0)
+	OpenClose.Font = Enum.Font.GothamBold
+	OpenClose.Text = "UI"
 	OpenClose.TextColor3 = Color3.fromRGB(255, 255, 255)
-	OpenClose.TextSize = 12.000
+	OpenClose.TextSize = 12
 	UICorner_4.CornerRadius = UDim.new(0, 4)
 	UICorner_4.Parent = OpenClose
-	UIAspectRatioConstraint_3.Parent = OpenClose
-	UIAspectRatioConstraint_4.Parent = backraund
-	UICorner_5.CornerRadius = UDim.new(0, 4)
-	UICorner_5.Parent = OpEn
 
-	UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(170, 0, 255)), ColorSequenceKeypoint.new(0.78, Color3.fromRGB(43, 13, 104)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(43, 13, 104))}
-	UIGradient_2.Rotation = 36
-	UIGradient_2.Parent = OpEn
-	UIAspectRatioConstraint_5.Parent = OpEn
-	UIAspectRatioConstraint_5.AspectRatio = 1.290
-
+	-- Main TAB Frame
 	TAB.Name = "TAB"
 	TAB.Parent = retace
 	TAB.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
-	TAB.Position = UDim2.new(0.1556, 0, 0.3280, 2)
+	TAB.Position = UDim2.new(0.5, -284, 0.5, -162) -- Center screen
 	TAB.Size = UDim2.new(0, 568, 0, 24)
-	TAB.ZIndex = 99999
 	UICorner_6.CornerRadius = UDim.new(0, 4)
 	UICorner_6.Parent = TAB
 
-	TABline.Name = "TABline"
+	-- Draggable Logic (Mobile Friendly)
+	local dragging, dragInput, dragStart, startPos
+	local function Update(input)
+		local delta = input.Position - dragStart
+		TAB.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	TAB.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = TAB.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			end)
+		end
+	end)
+	TAB.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and input == dragInput then Update(input) end
+	end)
+
+	-- Decor Lines
 	TABline.Parent = TAB
 	TABline.BackgroundColor3 = Color3.fromRGB(82, 255, 177)
-	TABline.Position = UDim2.new(1, 0, 0.1000, 0)
-	TABline.Size = UDim2.new(0, -568, 0, 1)
+	TABline.Position = UDim2.new(0, 0, 1, 0)
+	TABline.Size = UDim2.new(1, 0, 0, 1)
 	TABline.ZIndex = 2
-	UICorner_7.CornerRadius = UDim.new(0, 4)
 	UICorner_7.Parent = TABline
 
-	TABline_2.Name = "TABline"
 	TABline_2.Parent = TAB
 	TABline_2.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
-	TABline_2.Position = UDim2.new(-0.0001, 0, 0.1311, 21)
-	TABline_2.Size = UDim2.new(0, 568, 0, 1)
+	TABline_2.Position = UDim2.new(0, 0, 1, 21)
+	TABline_2.Size = UDim2.new(1, 0, 0, 1)
 	TABline_2.ZIndex = 99
-	UICorner_8.CornerRadius = UDim.new(0, 4)
 	UICorner_8.Parent = TABline_2
-	UIAspectRatioConstraint_6.Parent = TABline_2
-	UIAspectRatioConstraint_6.AspectRatio = 567.000
 
-	Name.Name = "Name"
 	Name.Parent = TAB
-	Name.BackgroundTransparency = 1.000
-	Name.Position = UDim2.new(0.0404, 0, 0.2145, 0)
+	Name.BackgroundTransparency = 1
+	Name.Position = UDim2.new(0.04, 0, 0.2, 0)
 	Name.Size = UDim2.new(0, 153, 0, 19)
 	Name.ZIndex = 999
 	Name.Font = Enum.Font.SourceSans
 	Name.Text = HubName or "Nyma"
 	Name.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Name.TextScaled = true
-	Name.TextSize = 14.000
-	Name.TextWrapped = true
-	UIAspectRatioConstraint_7.Parent = Name
-	UIAspectRatioConstraint_7.AspectRatio = 8.053
-	UITextSizeConstraint.Parent = Name
-	UITextSizeConstraint.MaxTextSize = 14
+	Name.TextSize = 14
 
-	MenuBackround.Name = "MenuBackround"
+	-- Menu Background
 	MenuBackround.Parent = TAB
 	MenuBackround.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 	MenuBackround.ClipsDescendants = true
-	MenuBackround.Position = UDim2.new(-0.0001, 0, -0.0311, 0)
-	MenuBackround.Size = UDim2.new(0, 568, 0, 324)
+	MenuBackround.Position = UDim2.new(0, 0, 1, 0)
+	MenuBackround.Size = UDim2.new(1, 0, 13.5, 0) -- 324px height approx
 	UICorner_9.CornerRadius = UDim.new(0, 5)
 	UICorner_9.Parent = MenuBackround
 
+	-- Close Button
 	Close.Name = "Close"
 	Close.Parent = MenuBackround
-	Close.BackgroundTransparency = 1.000
-	Close.Position = UDim2.new(0.0052, 0, 0.0282, 0)
-	Close.Size = UDim2.new(0, 26, 0, 13)
-	Close.ZIndex = 999999
-	Close.Font = Enum.Font.Unknown
+	Close.BackgroundTransparency = 1
+	Close.Position = UDim2.new(0.005, 0, 0.02, 0)
+	Close.Size = UDim2.new(0, 26, 0, 20)
+	Close.ZIndex = 999
+	Close.Font = Enum.Font.GothamBold
 	Close.Text = "X"
 	Close.TextColor3 = Color3.fromRGB(135, 8, 213)
-	Close.TextSize = 17.000
+	Close.TextSize = 17
 	UICorner_10.Parent = Close
-	UIAspectRatioConstraint_8.Parent = Close
-	UIAspectRatioConstraint_8.AspectRatio = 2.400
 
-	PageList.Name = "PageList"
+	-- Page List (Left Side)
 	PageList.Parent = MenuBackround
 	PageList.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
-	PageList.Position = UDim2.new(0, 0, 0.1027, 0)
+	PageList.Position = UDim2.new(0, 0, 0.1, 0)
 	PageList.Size = UDim2.new(0, 100, 0, 288)
-	PageList.SizeConstraint = Enum.SizeConstraint.RelativeYY
 	PageList.ZIndex = 22
 	PageList.ScrollBarThickness = 0
 	UICorner_11.CornerRadius = UDim.new(0, 5)
 	UICorner_11.Parent = PageList
-
+	
 	UIPageLayout.Parent = PageList
 	UIPageLayout.FillDirection = Enum.FillDirection.Vertical
 	UIPageLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	UIPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIPageLayout.Padding = UDim.new(0, 5)
 
-	grt.Name = "grt"
-	grt.Parent = MenuBackround
-	grt.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-	grt.Position = UDim2.new(0, 0, -0.0268, 34)
-	grt.Size = UDim2.new(0, 100, 0, 8)
-	grt.ZIndex = 21
-	UIAspectRatioConstraint_9.Parent = grt
-	UIAspectRatioConstraint_9.AspectRatio = 12.500
-	UIAspectRatioConstraint_10.Parent = MenuBackround
-	UIAspectRatioConstraint_10.AspectRatio = 1.753
-
+	-- Main Content Area (The "Features Menu" holder)
 	bckMenu.Name = "bckMenu"
 	bckMenu.Parent = MenuBackround
-	bckMenu.BackgroundTransparency = 1.000
-	bckMenu.Position = UDim2.new(0.1883, 0, 0.0771, 0)
-	bckMenu.Size = UDim2.new(0, 459, 0, 296)
+	bckMenu.BackgroundTransparency = 1
+	bckMenu.Position = UDim2.new(0.188, 0, 0.077, 0)
+	bckMenu.Size = UDim2.new(0.8, 0, 0.9, 0)
 	bckMenu.ZIndex = 999
 
 	functionable1menu.Name = "functionable1menu"
 	functionable1menu.Parent = bckMenu
 
-	UIPageLayout_4.Parent = functionable1menu
-	UIPageLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
-	UIPageLayout_4.EasingDirection = Enum.EasingDirection.In
-	UIPageLayout_4.GamepadInputEnabled = false
-	UIPageLayout_4.TweenTime = 0.500 -- Немного быстрее
-	
-	UIAspectRatioConstraint_17.Parent = bckMenu
-	UIAspectRatioConstraint_17.AspectRatio = 1.551
+	UIPageLayout_Content.Parent = functionable1menu
+	UIPageLayout_Content.SortOrder = Enum.SortOrder.LayoutOrder
+	UIPageLayout_Content.EasingDirection = Enum.EasingDirection.In
+	UIPageLayout_Content.TweenTime = 0.5
 
-	PAGEline.Name = "PAGEline"
+	-- Vertical Divider Line
 	PAGEline.Parent = TAB
 	PAGEline.BackgroundColor3 = Color3.fromRGB(46, 46, 46)
-	PAGEline.Position = UDim2.new(-0.0836, -2, 0.4247, 163)
-	PAGEline.Rotation = 90.000
-	PAGEline.Size = UDim2.new(0, 300, 0, 1)
-	PAGEline.ZIndex = 999999999
-	UICorner_21.CornerRadius = UDim.new(0, 4)
+	PAGEline.Position = UDim2.new(0.17, 0, 7, 0) -- Adjusted
+	PAGEline.Size = UDim2.new(0, 1, 0, 300)
+	PAGEline.ZIndex = 999
 	UICorner_21.Parent = PAGEline
-	UIAspectRatioConstraint_18.Parent = PAGEline
-	UIAspectRatioConstraint_18.AspectRatio = 300.000
-	UIAspectRatioConstraint_19.Parent = TAB
-	UIAspectRatioConstraint_19.AspectRatio = 23.667
-	UIAspectRatioConstraint_20.Parent = retace
-	UIAspectRatioConstraint_20.AspectRatio = 1.154
 
-	--// Logic Functions
-	
-	-- Draggable functionality
-	local function MakeDraggable(frame)
-		local dragging, dragInput, dragStart, startPos
-		frame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				dragging = true
-				dragStart = input.Position
-				startPos = frame.Position
-				input.Changed:Connect(function()
-					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false
-					end
-				end)
-			end
-		end)
-		frame.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-				dragInput = input
-			end
-		end)
-		UserInputService.InputChanged:Connect(function(input)
-			if dragging and input == dragInput then
-				local delta = input.Position - dragStart
-				frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-			end
-		end)
-	end
-	MakeDraggable(TAB)
-
-	-- Close Logic
+	--// Logic: Open/Close
 	local UIHidden = false
 	OpenClose.MouseButton1Click:Connect(function()
 		UIHidden = not UIHidden
@@ -319,296 +244,234 @@ function Library:CreateWindow(HubName)
 		retace:Destroy()
 	end)
 
-	--// Return Wrapper
+	--// Library Logic
 	local Window = {}
-	
+
 	function Window:Tab(TabName)
-		-- Create Tab Button
-		local BorderPAGEBtn = Instance.new("Frame")
-		local PAgeBtn = Instance.new("TextButton")
-		local UICorner_Btn1 = Instance.new("UICorner")
-		local UICorner_Btn2 = Instance.new("UICorner")
-
-		BorderPAGEBtn.Name = TabName .. "Border"
-		BorderPAGEBtn.Parent = PageList
-		BorderPAGEBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
-		BorderPAGEBtn.Size = UDim2.new(0, 93, 0, 27)
-		BorderPAGEBtn.ZIndex = 93
-		UICorner_Btn1.Parent = BorderPAGEBtn
-
-		PAgeBtn.Name = "PAgeBtn"
-		PAgeBtn.Parent = BorderPAGEBtn
-		PAgeBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-		PAgeBtn.Size = UDim2.new(0, 92, 0, 25)
-		PAgeBtn.Position = UDim2.new(0.007, 0, 0.058, 0)
-		PAgeBtn.ZIndex = 95
-		PAgeBtn.Font = Enum.Font.SourceSans
-		PAgeBtn.Text = TabName
-		PAgeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		PAgeBtn.TextSize = 14.000
-		UICorner_Btn2.Parent = PAgeBtn
-
-		-- Create Tab Content Page
-		local MenuScroll = Instance.new("ScrollingFrame")
-		local ScrollLayout = Instance.new("UIPageLayout") -- Using GridLayout/ListLayout for content
-		local ListLayout = Instance.new("UIListLayout")
+		-- 1. Left Side Button
+		local BorderBtn = Instance.new("Frame")
+		local Btn = Instance.new("TextButton")
 		
-		MenuScroll.Name = TabName .. "_Page"
-		MenuScroll.Parent = functionable1menu
-		MenuScroll.Active = true
-		MenuScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-		MenuScroll.BackgroundTransparency = 1
-		MenuScroll.BorderSizePixel = 0
-		MenuScroll.Size = UDim2.new(1, 0, 1, 0)
-		MenuScroll.ScrollBarThickness = 0
-		MenuScroll.ZIndex = 88
-		
-		ListLayout.Parent = MenuScroll
-		ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		ListLayout.Padding = UDim.new(0, 5)
+		BorderBtn.Parent = PageList
+		BorderBtn.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+		BorderBtn.Size = UDim2.new(0, 93, 0, 27)
+		BorderBtn.ZIndex = 93
+		Instance.new("UICorner", BorderBtn).CornerRadius = UDim.new(0, 4)
 
-		-- Tab Switching Logic
-		PAgeBtn.MouseButton1Click:Connect(function()
-			-- Simple logic to jump to page
-			UIPageLayout_4:JumpTo(MenuScroll)
-			
-			-- Reset colors of all buttons (optional visual)
+		Btn.Parent = BorderBtn
+		Btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		Btn.Position = UDim2.new(0.01, 0, 0.05, 0)
+		Btn.Size = UDim2.new(0.98, 0, 0.9, 0)
+		Btn.ZIndex = 95
+		Btn.Font = Enum.Font.SourceSans
+		Btn.Text = TabName
+		Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Btn.TextSize = 14
+		Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 4)
+
+		-- 2. The "Features Menu" (Replicating your Menu structure)
+		-- Это и есть твой "Main", куда складываются функции
+		local MenuContainer = Instance.new("ScrollingFrame")
+		local MenuList = Instance.new("UIListLayout")
+		
+		MenuContainer.Name = TabName.."_Menu"
+		MenuContainer.Parent = functionable1menu
+		MenuContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Цвет как у твоих features menu
+		MenuContainer.Size = UDim2.new(1, 0, 1, 0) -- На весь bckMenu
+		MenuContainer.ScrollBarThickness = 0
+		MenuContainer.BorderSizePixel = 0
+		Instance.new("UICorner", MenuContainer).CornerRadius = UDim.new(0, 5)
+
+		MenuList.Parent = MenuContainer
+		MenuList.SortOrder = Enum.SortOrder.LayoutOrder
+		MenuList.Padding = UDim.new(0, 5)
+		MenuList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+		-- Switching Logic
+		Btn.MouseButton1Click:Connect(function()
+			UIPageLayout_Content:JumpTo(MenuContainer)
+			-- Reset colors
 			for _, v in pairs(PageList:GetChildren()) do
-				if v:IsA("Frame") and v:FindFirstChild("PAgeBtn") then
-					v.PAgeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				if v:IsA("Frame") and v:FindFirstChild("TextButton") then
+					v.TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 				end
 			end
-			PAgeBtn.TextColor3 = Color3.fromRGB(157, 76, 255) -- Selected Color
+			Btn.TextColor3 = Color3.fromRGB(157, 76, 255)
 		end)
 
-		local TabFunctions = {}
+		local TabFuncs = {}
 
-		function TabFunctions:Button(BtnText, Callback)
-			Callback = Callback or function() end
-			
-			local TextButton = Instance.new("TextButton")
-			local UICorner_Btn = Instance.new("UICorner")
-			
-			TextButton.Parent = MenuScroll
-			TextButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-			TextButton.Size = UDim2.new(0.9, 0, 0, 30)
-			TextButton.Position = UDim2.new(0.05, 0, 0, 0)
-			TextButton.ZIndex = 90
-			TextButton.Font = Enum.Font.SourceSans
-			TextButton.Text = BtnText
-			TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-			TextButton.TextSize = 14.000
-			
-			UICorner_Btn.CornerRadius = UDim.new(0, 3)
-			UICorner_Btn.Parent = TextButton
-			
-			TextButton.MouseButton1Click:Connect(function()
-				pcall(Callback)
-				-- Click animation
-				TweenService:Create(TextButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+		function TabFuncs:Button(text, callback)
+			local ButtonFrame = Instance.new("TextButton")
+			ButtonFrame.Parent = MenuContainer
+			ButtonFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+			ButtonFrame.Size = UDim2.new(0.95, 0, 0, 30) -- Побольше для пальца
+			ButtonFrame.Text = text
+			ButtonFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ButtonFrame.Font = Enum.Font.SourceSans
+			ButtonFrame.TextSize = 14
+			Instance.new("UICorner", ButtonFrame).CornerRadius = UDim.new(0, 3)
+
+			ButtonFrame.MouseButton1Click:Connect(function()
+				pcall(callback)
+				TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
 				wait(0.1)
-				TweenService:Create(TextButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
+				TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
 			end)
 		end
 
-		function TabFunctions:Toggle(ToggleText, Default, Callback)
-			Default = Default or false
-			Callback = Callback or function() end
-			local Toggled = Default
-			
-			local CheckBoxFrame = Instance.new("Frame")
+		function TabFuncs:Toggle(text, default, callback)
+			local CheckBox = Instance.new("Frame")
 			local CheckBoxBtn = Instance.new("TextButton")
-			local UICorner_Toggle = Instance.new("UICorner")
-			local NameFunction = Instance.new("TextLabel")
-			local UICorner_Frame = Instance.new("UICorner")
+			local FuncName = Instance.new("TextLabel")
+			local Toggled = default or false
 
-			CheckBoxFrame.Name = "CheckBoxFrame"
-			CheckBoxFrame.Parent = MenuScroll
-			CheckBoxFrame.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-			CheckBoxFrame.Size = UDim2.new(0.9, 0, 0, 30) -- Bigger for better click
-			
-			UICorner_Frame.CornerRadius = UDim.new(0, 4)
-			UICorner_Frame.Parent = CheckBoxFrame
+			CheckBox.Parent = MenuContainer
+			CheckBox.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+			CheckBox.Size = UDim2.new(0.95, 0, 0, 30)
+			Instance.new("UICorner", CheckBox).CornerRadius = UDim.new(0, 4)
 
-			CheckBoxBtn.Name = "ToggleBtn"
-			CheckBoxBtn.Parent = CheckBoxFrame
+			CheckBoxBtn.Parent = CheckBox
 			CheckBoxBtn.BackgroundColor3 = Toggled and Color3.fromRGB(157, 76, 255) or Color3.fromRGB(35, 35, 35)
-			CheckBoxBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
-			CheckBoxBtn.Size = UDim2.new(0, 18, 0, 18)
-			CheckBoxBtn.ZIndex = 90
-			CheckBoxBtn.Font = Enum.Font.SourceSans
+			CheckBoxBtn.Position = UDim2.new(0.03, 0, 0.15, 0)
+			CheckBoxBtn.Size = UDim2.new(0, 20, 0, 20)
 			CheckBoxBtn.Text = ""
-			
-			UICorner_Toggle.CornerRadius = UDim.new(0.3, 0)
-			UICorner_Toggle.Parent = CheckBoxBtn
+			Instance.new("UICorner", CheckBoxBtn).CornerRadius = UDim.new(0.3, 0)
 
-			NameFunction.Name = "NameFunction"
-			NameFunction.Parent = CheckBoxFrame
-			NameFunction.BackgroundTransparency = 1
-			NameFunction.Position = UDim2.new(0.15, 0, 0, 0)
-			NameFunction.Size = UDim2.new(0.8, 0, 1, 0)
-			NameFunction.ZIndex = 88
-			NameFunction.Font = Enum.Font.SourceSans
-			NameFunction.Text = ToggleText
-			NameFunction.TextColor3 = Color3.fromRGB(255, 255, 255)
-			NameFunction.TextSize = 14.000
-			NameFunction.TextXAlignment = Enum.TextXAlignment.Left
+			FuncName.Parent = CheckBox
+			FuncName.BackgroundTransparency = 1
+			FuncName.Position = UDim2.new(0.15, 0, 0, 0)
+			FuncName.Size = UDim2.new(0.8, 0, 1, 0)
+			FuncName.Font = Enum.Font.SourceSans
+			FuncName.Text = text
+			FuncName.TextColor3 = Color3.fromRGB(255, 255, 255)
+			FuncName.TextSize = 14
+			FuncName.TextXAlignment = Enum.TextXAlignment.Left
 
-			-- Logic
-			local function UpdateToggle()
+			local function Update()
 				Toggled = not Toggled
-				if Toggled then
-					TweenService:Create(CheckBoxBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(157, 76, 255)}):Play()
-				else
-					TweenService:Create(CheckBoxBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-				end
-				pcall(Callback, Toggled)
+				local targetColor = Toggled and Color3.fromRGB(157, 76, 255) or Color3.fromRGB(35, 35, 35)
+				TweenService:Create(CheckBoxBtn, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
+				pcall(callback, Toggled)
 			end
-			
-			CheckBoxBtn.MouseButton1Click:Connect(UpdateToggle)
-			-- Allow clicking the whole frame too
-			local InvisBtn = Instance.new("TextButton")
-			InvisBtn.Parent = CheckBoxFrame
-			InvisBtn.Size = UDim2.new(1,0,1,0)
-			InvisBtn.BackgroundTransparency = 1
-			InvisBtn.ZIndex = 80
-			InvisBtn.Text = ""
-			InvisBtn.MouseButton1Click:Connect(UpdateToggle)
+
+			CheckBoxBtn.MouseButton1Click:Connect(Update)
+			-- Invisible button to make clicking easier on mobile
+			local InvBtn = Instance.new("TextButton")
+			InvBtn.Parent = CheckBox
+			InvBtn.BackgroundTransparency = 1
+			InvBtn.Size = UDim2.new(1,0,1,0)
+			InvBtn.Text = ""
+			InvBtn.ZIndex = 5
+			InvBtn.MouseButton1Click:Connect(Update)
 		end
 
-		function TabFunctions:Slider(SliderText, Min, Max, Default, Callback)
-			Min = Min or 0
-			Max = Max or 100
-			Default = Default or Min
-			Callback = Callback or function() end
-			
+		function TabFuncs:Slider(text, min, max, default, callback)
 			local SliderFrame = Instance.new("Frame")
-			local SliderCorner = Instance.new("UICorner")
-			local SliderLabel = Instance.new("TextLabel")
-			local SliderValue = Instance.new("TextLabel")
-			local SliderBar = Instance.new("Frame")
-			local SliderBarCorner = Instance.new("UICorner")
-			local SliderFill = Instance.new("Frame")
-			local SliderFillCorner = Instance.new("UICorner")
-			local TriggerBtn = Instance.new("TextButton")
-			
-			SliderFrame.Name = "SliderFrame"
-			SliderFrame.Parent = MenuScroll
+			local Label = Instance.new("TextLabel")
+			local ValLabel = Instance.new("TextLabel")
+			local Bar = Instance.new("Frame")
+			local Fill = Instance.new("Frame")
+			local TouchZone = Instance.new("TextButton") -- For mobile touch
+
+			SliderFrame.Parent = MenuContainer
 			SliderFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-			SliderFrame.Size = UDim2.new(0.9, 0, 0, 45)
-			SliderFrame.ZIndex = 90
-			
-			SliderCorner.CornerRadius = UDim.new(0, 4)
-			SliderCorner.Parent = SliderFrame
-			
-			SliderLabel.Parent = SliderFrame
-			SliderLabel.BackgroundTransparency = 1
-			SliderLabel.Position = UDim2.new(0.05, 0, 0, 5)
-			SliderLabel.Size = UDim2.new(0.5, 0, 0, 20)
-			SliderLabel.Font = Enum.Font.SourceSans
-			SliderLabel.Text = SliderText
-			SliderLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			SliderLabel.TextSize = 14
-			SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
-			
-			SliderValue.Parent = SliderFrame
-			SliderValue.BackgroundTransparency = 1
-			SliderValue.Position = UDim2.new(0.55, 0, 0, 5)
-			SliderValue.Size = UDim2.new(0.4, 0, 0, 20)
-			SliderValue.Font = Enum.Font.SourceSans
-			SliderValue.Text = tostring(Default)
-			SliderValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-			SliderValue.TextSize = 14
-			SliderValue.TextXAlignment = Enum.TextXAlignment.Right
-			
-			SliderBar.Parent = SliderFrame
-			SliderBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-			SliderBar.Position = UDim2.new(0.05, 0, 0.65, 0)
-			SliderBar.Size = UDim2.new(0.9, 0, 0, 8)
-			
-			SliderBarCorner.CornerRadius = UDim.new(1, 0)
-			SliderBarCorner.Parent = SliderBar
-			
-			SliderFill.Parent = SliderBar
-			SliderFill.BackgroundColor3 = Color3.fromRGB(157, 76, 255) -- Watermark color
-			SliderFill.Size = UDim2.new((Default - Min) / (Max - Min), 0, 1, 0)
-			
-			SliderFillCorner.CornerRadius = UDim.new(1, 0)
-			SliderFillCorner.Parent = SliderFill
-			
-			TriggerBtn.Parent = SliderBar
-			TriggerBtn.BackgroundTransparency = 1
-			TriggerBtn.Size = UDim2.new(1, 0, 1, 0)
-			TriggerBtn.Text = ""
-			
+			SliderFrame.Size = UDim2.new(0.95, 0, 0, 45)
+			Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0, 4)
+
+			Label.Parent = SliderFrame
+			Label.BackgroundTransparency = 1
+			Label.Position = UDim2.new(0.05, 0, 0.1, 0)
+			Label.Size = UDim2.new(0.5, 0, 0, 15)
+			Label.Font = Enum.Font.SourceSans
+			Label.Text = text
+			Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+			Label.TextSize = 14
+			Label.TextXAlignment = Enum.TextXAlignment.Left
+
+			ValLabel.Parent = SliderFrame
+			ValLabel.BackgroundTransparency = 1
+			ValLabel.Position = UDim2.new(0.7, 0, 0.1, 0)
+			ValLabel.Size = UDim2.new(0.25, 0, 0, 15)
+			ValLabel.Font = Enum.Font.SourceSans
+			ValLabel.Text = tostring(default)
+			ValLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ValLabel.TextSize = 14
+			ValLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+			Bar.Parent = SliderFrame
+			Bar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+			Bar.Position = UDim2.new(0.05, 0, 0.6, 0)
+			Bar.Size = UDim2.new(0.9, 0, 0, 10) -- Thick enough for mobile
+			Instance.new("UICorner", Bar).CornerRadius = UDim.new(1, 0)
+
+			Fill.Parent = Bar
+			Fill.BackgroundColor3 = Color3.fromRGB(157, 76, 255)
+			Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+			Instance.new("UICorner", Fill).CornerRadius = UDim.new(1, 0)
+
+			TouchZone.Parent = Bar
+			TouchZone.BackgroundTransparency = 1
+			TouchZone.Size = UDim2.new(1, 0, 1, 0)
+			TouchZone.Text = ""
+
 			local dragging = false
-			
-			local function Set(value)
-				value = math.clamp(value, Min, Max)
-				local percent = (value - Min) / (Max - Min)
-				SliderFill.Size = UDim2.new(percent, 0, 1, 0)
-				SliderValue.Text = tostring(math.floor(value))
-				pcall(Callback, value)
+			local function Move(input)
+				local pos = input.Position.X
+				local percent = math.clamp((pos - Bar.AbsolutePosition.X) / Bar.AbsoluteSize.X, 0, 1)
+				local value = math.floor(min + (max - min) * percent)
+				Fill.Size = UDim2.new(percent, 0, 1, 0)
+				ValLabel.Text = tostring(value)
+				pcall(callback, value)
 			end
-			
-			TriggerBtn.InputBegan:Connect(function(input)
+
+			TouchZone.InputBegan:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					dragging = true
+					Move(input)
 				end
 			end)
-			
-			TriggerBtn.InputEnded:Connect(function(input)
+			TouchZone.InputEnded:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					dragging = false
 				end
 			end)
-			
 			UserInputService.InputChanged:Connect(function(input)
 				if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-					local SizeScale = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
-					local Value = Min + ((Max - Min) * SizeScale)
-					Set(Value)
+					Move(input)
 				end
 			end)
 		end
 
-		return TabFunctions
+		return TabFuncs
 	end
 
 	return Window
 end
 
---[[ 
-	=============================================
-	ПРИМЕР ИСПОЛЬЗОВАНИЯ (EXAMPLE SCRIPT)
-	=============================================
-]]
+-- // ПРИМЕР ИСПОЛЬЗОВАНИЯ (Копируй это вниз) // --
+-- Создаем библиотеку
+local Library = Library:CreateWindow("Nyma Premium Mobile")
 
-local MyLibrary = Library:CreateWindow("Test Hub")
+-- 1. Создаем вкладки (Они же создают твои меню-контейнеры)
+local MainTab = Library:Tab("Main")
+local VisualsTab = Library:Tab("Visuals")
 
--- Создаем первую вкладку
-local MainTab = MyLibrary:Tab("Main")
-
-MainTab:Button("Kill All", function()
-	print("Button pressed!")
-end)
-
+-- 2. Добавляем функции
 MainTab:Toggle("Auto Farm", false, function(state)
-	print("Auto Farm is now:", state)
+	print("AutoFarm:", state)
 end)
 
-MainTab:Slider("Speed", 16, 200, 16, function(val)
-	print("Speed set to:", math.floor(val))
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+MainTab:Slider("WalkSpeed", 16, 200, 16, function(val)
+	if game.Players.LocalPlayer.Character then
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+	end
 end)
 
--- Создаем вторую вкладку
-local VisualsTab = MyLibrary:Tab("Visuals")
-
-VisualsTab:Toggle("ESP", false, function(v)
-	print("ESP:", v)
+MainTab:Button("Fly Script", function()
+	print("Fly Activated")
 end)
 
-VisualsTab:Button("Reset Character", function()
-	game.Players.LocalPlayer.Character:BreakJoints()
+VisualsTab:Toggle("ESP", true, function(s)
+	print("ESP is", s)
 end)
